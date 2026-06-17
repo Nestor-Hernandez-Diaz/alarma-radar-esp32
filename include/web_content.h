@@ -436,8 +436,8 @@ const char index_html[] PROGMEM = R"rawliteral(
             
             // 1. Efecto de brillo táctico (gradiente radial)
             let grad = ctx.createRadialGradient(ox, oy, 1, ox, oy, 14);
-            grad.addColorStop(0, t.isVisitor ? `rgba(255, 165, 0, ${opacity})` : `rgba(255, 7, 58, ${opacity})`);
-            grad.addColorStop(0.3, t.isVisitor ? `rgba(255, 165, 0, ${opacity * 0.4})` : `rgba(255, 7, 58, ${opacity * 0.4})`);
+            grad.addColorStop(0, t.isVisitor ? `rgba(255, 165, 0, ${opacity})` : `rgba(0, 240, 255, ${opacity})`);
+            grad.addColorStop(0.3, t.isVisitor ? `rgba(255, 165, 0, ${opacity * 0.4})` : `rgba(0, 240, 255, ${opacity * 0.4})`);
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             
             ctx.fillStyle = grad;
@@ -448,7 +448,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             // 2. Retícula Táctica (Círculo de objetivo + Cruz de mira)
             ctx.lineWidth = 1.5;
             if (t.isVisitor) {
-                // Diamante para visitante
+                // Diamante para visitante (Naranja)
                 ctx.strokeStyle = `rgba(255, 165, 0, ${opacity * 0.85})`;
                 ctx.beginPath();
                 ctx.moveTo(ox, oy - 7);
@@ -458,8 +458,8 @@ const char index_html[] PROGMEM = R"rawliteral(
                 ctx.closePath();
                 ctx.stroke();
             } else {
-                // Círculo + Cruz de mira para intruso
-                ctx.strokeStyle = `rgba(255, 7, 58, ${opacity * 0.85})`;
+                // Círculo + Cruz de mira para zona segura (Azul Neón)
+                ctx.strokeStyle = `rgba(0, 240, 255, ${opacity * 0.85})`;
                 
                 // Círculo
                 ctx.beginPath();
@@ -468,10 +468,10 @@ const char index_html[] PROGMEM = R"rawliteral(
                 
                 // Líneas de la cruz
                 ctx.beginPath();
-                ctx.moveTo(ox - 10, oy); ctx.lineTo(ox - 3, oy);
-                ctx.moveTo(ox + 3, oy); ctx.lineTo(ox + 10, oy);
-                ctx.moveTo(ox, oy - 10); ctx.lineTo(ox, oy - 3);
-                ctx.moveTo(ox, oy + 3); ctx.lineTo(ox, oy + 10);
+                ctx.moveTo(ox - 9, oy); ctx.lineTo(ox - 3, oy);
+                ctx.moveTo(ox + 3, oy); ctx.lineTo(ox + 9, oy);
+                ctx.moveTo(ox, oy - 9); ctx.lineTo(ox, oy - 3);
+                ctx.moveTo(ox, oy + 3); ctx.lineTo(ox, oy + 9);
                 ctx.stroke();
             }
         }
@@ -504,7 +504,7 @@ const char index_html[] PROGMEM = R"rawliteral(
                         targets[i].angle = currentAngle;
                         targets[i].dist = currentDist;
                         targets[i].age = 0;
-                        targets[i].isVisitor = currentDist <= 20;
+                        targets[i].isVisitor = currentDist <= 15;
                         targetFound = true;
                         break;
                     }
@@ -515,7 +515,7 @@ const char index_html[] PROGMEM = R"rawliteral(
                         dist: currentDist,
                         age: 0,
                         maxAge: 35,
-                        isVisitor: currentDist <= 20
+                        isVisitor: currentDist <= 15
                     });
                 }
             }

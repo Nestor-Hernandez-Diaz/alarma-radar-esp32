@@ -25,6 +25,15 @@ void displayInit() {
 }
 
 void displayShowStatus(const char* ipStr) {
+    static SystemState lastDispState = (SystemState)-1;
+    static String lastDispIp = "";
+    
+    if (currentState == lastDispState && String(ipStr) == lastDispIp) {
+        return; // Evita redibujar innecesariamente reduciendo el parpadeo
+    }
+    lastDispState = currentState;
+    lastDispIp = String(ipStr);
+
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
@@ -75,18 +84,12 @@ void displayShowStatus(const char* ipStr) {
             break;
             
         case STATE_WAITING:
-            display.setTextSize(1);
-            display.setCursor(5, 18);
-            display.println(F("¿QUIEN ESTA AHI?"));
-            display.setCursor(5, 30);
-            display.println(F("Esperando respuesta"));
-            display.setCursor(5, 42);
-            display.println(F("del operador..."));
-            
-            // Draw a question mark
             display.setTextSize(2);
-            display.setCursor(105, 20);
-            display.println(F("?"));
+            // Centrado vertical y horizontal para texto grande
+            display.setCursor(16, 16);
+            display.print(F("¿QUIEN"));
+            display.setCursor(16, 36);
+            display.print(F("ESTA AHI?"));
             break;
             
         case STATE_GRANTED:

@@ -111,23 +111,23 @@ void updateBuzzerLED() {
             
         case STATE_WAITING:
             alarmActive = false;
-            // Play Ding-Dong sequence once using buzzerPWM.writeTone()
-            if (elapsed < 200) { // "Ding"
-                buzzerPWM.writeTone(880); // 880 Hz
-                digitalWrite(PIN_LED, HIGH);
-            } else if (elapsed >= 200 && elapsed < 350) { // Gap
-                if (buzzerPWM.read() != 0) {
-                    buzzerPWM.write(0);
+            // Repetir secuencia Ding-Dong cada 2.5 segundos (2500ms)
+            {
+                int cycle = elapsed % 2500;
+                if (cycle < 200) { // "Ding"
+                    buzzerPWM.writeTone(880); // 880 Hz
+                } else if (cycle >= 200 && cycle < 350) { // Silencio entre Ding y Dong
+                    if (buzzerPWM.read() != 0) {
+                        buzzerPWM.write(0);
+                    }
+                } else if (cycle >= 350 && cycle < 750) { // "Dong"
+                    buzzerPWM.writeTone(659); // 659 Hz
+                } else { // Silencio hasta el próximo ciclo
+                    if (buzzerPWM.read() != 0) {
+                        buzzerPWM.write(0);
+                    }
                 }
-                digitalWrite(PIN_LED, LOW);
-            } else if (elapsed >= 350 && elapsed < 750) { // "Dong"
-                buzzerPWM.writeTone(659); // 659 Hz
-                digitalWrite(PIN_LED, HIGH);
-            } else { // End of chime
-                if (buzzerPWM.read() != 0) {
-                    buzzerPWM.write(0);
-                }
-                digitalWrite(PIN_LED, LOW);
+                digitalWrite(PIN_LED, LOW); // El LED permanece apagado en este estado
             }
             break;
             
@@ -168,8 +168,11 @@ void radarLoop() {
     if (millis() - lastRadarMove >= radarMoveInterval) {
         lastRadarMove = millis();
         
-        servoRadarPan.write(angle);
-        currentAngle = angle;
+        // Mover el servo y actualizar ángulo solo si no estamos esperando visitante
+        if (currentState != STATE_WAITING) {
+            servoRadarPan.write(angle);
+            currentAngle = angle;
+        }
         
         // Measure distance
         unsigned int uS = sonar.ping();
@@ -183,45 +186,26 @@ void radarLoop() {
             lastDebugPrint = millis();
         }
         
-        // Only classify and alert if we aren't in a transient authorized state (GRANTED/DENIED)
+        // Only classify if we aren't in a transient authorized/denied state (GRANTED/DENIED)
         if (currentState != STATE_GRANTED && currentState != STATE_DENIED) {
-            
             if (currentDistance >= ALARM_MIN_DIST_CM && currentDistance <= VISITOR_MAX_DIST_CM) {
-                // Zone 1: Visitor at the door
+                // Zona de Visitante: <= 15 cm
                 currentState = STATE_WAITING;
-                lastVisitorInZone = millis();
-            } 
-            else if (currentDistance > VISITOR_MAX_DIST_CM && currentDistance <= ALARM_MAX_DIST_CM) {
-                // Zone 2: Intruder in the garden
-                // Only alert if we were secure or alert (don't override waiting state unless they leave)
-                if (currentState != STATE_WAITING) {
-                    currentState = STATE_ALERT;
-                } else {
-                    // If we were waiting, check if they retreated back to the garden
-                    if (millis() - lastVisitorInZone > 5000) {
-                        currentState = STATE_ALERT;
-                    }
-                }
             } 
             else {
-                // Zone 3: Clear
-                if (currentState == STATE_ALERT) {
-                    currentState = STATE_SECURE;
-                } 
-                else if (currentState == STATE_WAITING) {
-                    // Auto reset waiting state if visitor left the door for more than 5 seconds
-                    if (millis() - lastVisitorInZone > 5000) {
-                        currentState = STATE_SECURE;
-                    }
-                }
+                // Zona Segura: > 15 cm
+                currentState = STATE_SECURE;
             }
         }
         
         notifyClients(); // Notificar a los clientes web de la nueva posición y distancia
 
-        angle += angleStep;
-        if (angle >= 180 || angle <= 0) {
-            angleStep = -angleStep; // Reverse direction
+        // Incrementar ángulo de barrido solo si no estamos esperando visitante
+        if (currentState != STATE_WAITING) {
+            angle += angleStep;
+            if (angle >= 180 || angle <= 0) {
+                angleStep = -angleStep; // Reverse direction
+            }
         }
     }
 }

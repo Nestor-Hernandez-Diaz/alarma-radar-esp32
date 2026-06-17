@@ -39,7 +39,7 @@
 
 // Constantes de radar y alarma
 #define ALARM_MIN_DIST_CM 3
-#define VISITOR_MAX_DIST_CM 20
+#define VISITOR_MAX_DIST_CM 15
 #define ALARM_MAX_DIST_CM 50
 #define MAX_RADAR_DIST_CM 60
 

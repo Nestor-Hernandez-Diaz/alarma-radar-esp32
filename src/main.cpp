@@ -7,8 +7,8 @@
 #include <ESP32Servo.h>
 
 // Define uninitialized extern variables from config.h
-const char* WIFI_SSID = "ANDERSON";
-const char* WIFI_PASS = "Anderson1964@13";
+const char* WIFI_SSID = "Karen";
+const char* WIFI_PASS = "coco1234";
 
 unsigned long lastDisplayUpdate = 0;
 const int displayUpdateInterval = 1000;
