@@ -339,9 +339,9 @@ const char index_html[] PROGMEM = R"rawliteral(
             <div class="slider-container">
                 <div class="slider-label">
                     <span>Inclinación Radar (Tilt):</span>
-                    <span><span id="tiltVal">90</span>&deg;</span>
+                    <span><span id="tiltVal">145</span>&deg;</span>
                 </div>
-                <input type="range" id="tiltSlider" min="0" max="180" value="90" oninput="sendTilt(this.value)">
+                <input type="range" id="tiltSlider" min="0" max="180" value="145" oninput="sendTilt(this.value)">
             </div>
             
             <div style="margin-top: 15px;">

@@ -20,7 +20,7 @@ bool alarmState = false;
 
 volatile bool alarmActive = false;
 volatile int currentAngle = 0;
-volatile int currentTiltAngle = 90;
+volatile int currentTiltAngle = 145;
 volatile int currentDistance = 0;
 
 // Timers for non-blocking alerts
